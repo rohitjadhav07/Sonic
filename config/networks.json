@@ -1,0 +1,104 @@
+{
+  "sonic": {
+    "testnet": {
+      "chainId": 14601,
+      "name": "Sonic Testnet Network",
+      "network": "sonic-testnet",
+      "nativeCurrency": {
+        "name": "Sonic",
+        "symbol": "S",
+        "decimals": 18
+      },
+      "rpc": {
+        "http": [
+          "https://rpc.testnet.soniclabs.com"
+        ],
+        "websocket": [
+          "wss://rpc.testnet.soniclabs.com"
+        ]
+      },
+      "explorer": {
+        "name": "Sonic Testnet Explorer",
+        "url": "https://testnet.sonicscan.org",
+        "apiUrl": "https://testnet.sonicscan.org/api"
+      },
+      "faucet": {
+        "url": "https://testnet.sonicscan.org/faucet",
+        "description": "Get testnet S tokens for development"
+      },
+      "contracts": {
+        "multicall3": "0xcA11bde05977b3631167028862bE2a173976CA11"
+      },
+      "features": {
+        "feeMarket": true,
+        "eip1559": true,
+        "subSecondFinality": true,
+        "averageBlockTime": "0.4s",
+        "tps": "10000+",
+        "gasOptimization": "95%"
+      }
+    },
+    "mainnet": {
+      "chainId": 146,
+      "name": "Sonic Mainnet",
+      "network": "sonic-mainnet",
+      "nativeCurrency": {
+        "name": "Sonic",
+        "symbol": "S",
+        "decimals": 18
+      },
+      "rpc": {
+        "http": [
+          "https://rpc.soniclabs.com"
+        ],
+        "websocket": [
+          "wss://rpc.soniclabs.com"
+        ]
+      },
+      "explorer": {
+        "name": "Sonic Explorer",
+        "url": "https://soniclabs.com",
+        "apiUrl": "https://soniclabs.com/api"
+      },
+      "contracts": {
+        "multicall3": "0xcA11bde05977b3631167028862bE2a173976CA11"
+      },
+      "features": {
+        "feeMarket": true,
+        "eip1559": true,
+        "subSecondFinality": true,
+        "averageBlockTime": "0.4s",
+        "tps": "10000+",
+        "gasOptimization": "95%"
+      }
+    }
+  },
+  "development": {
+    "hardhat": {
+      "chainId": 31337,
+      "name": "Hardhat Local",
+      "network": "hardhat",
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "rpc": {
+        "http": ["http://127.0.0.1:8545"]
+      }
+    },
+    "localhost": {
+      "chainId": 31337,
+      "name": "Localhost",
+      "network": "localhost",
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "rpc": {
+        "http": ["http://127.0.0.1:8545"]
+      }
+    }
+  }
+}
