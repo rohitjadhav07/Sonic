@@ -124,7 +124,7 @@ export default function PaymentPage() {
                     {amount} S
                   </div>
                   <div className="text-sm text-blue-600">
-                    ≈ ${(parseFloat(amount) * 2.0).toFixed(2)} USD
+                    ≈ ${(parseFloat(amount) * 0.5).toFixed(2)} USD
                   </div>
                 </div>
               ) : (

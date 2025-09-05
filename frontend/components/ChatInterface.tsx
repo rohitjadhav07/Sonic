@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, Mic, MicOff, Copy, ExternalLink } from 'lucide-react'
+import { Send, Loader2, Copy, ExternalLink } from 'lucide-react'
 import { useAccount, useBalance, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
 import { sonicTestnet } from '../lib/wagmi'
@@ -26,9 +26,9 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isListening, setIsListening] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // Transaction hooks
   const { data: hash, sendTransaction } = useSendTransaction()
@@ -36,9 +36,7 @@ export default function ChatInterface() {
     hash,
   })
 
-  // Speech recognition state
-  const [speechSupported, setSpeechSupported] = useState(false)
-  const [transcript, setTranscript] = useState('')
+  // Voice input removed - text-only interface
 
   // Initialize client-side content
   useEffect(() => {
@@ -57,28 +55,25 @@ I can help you with:
 • DeFi operations and yield farming strategies
 • Smart contract interactions and deployment
 
-${isConnected ? `Your wallet is connected! Current balance: ${balance ? formatEther(balance.value) : '0'} S tokens.` : 'Please connect your wallet to get started.'}
+${isConnected ? `Your wallet is connected! Current balance: ${balance ? formatEther(balance.value) : '0'} S tokens ($${(balance ? parseFloat(formatEther(balance.value)) * 0.5 : 0).toFixed(2)} USD).` : 'Please connect your wallet to get started.'}
 
 What would you like to do?`,
         timestamp: new Date(),
       }
     ])
     
-    // Check speech recognition support
-    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      setSpeechSupported(true)
-    }
+    // Voice functionality removed
   }, [isConnected, balance])
 
-  // Update input when transcript changes
-  useEffect(() => {
-    if (transcript) {
-      setInput(transcript)
-    }
-  }, [transcript])
+  // Voice input removed
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
   }
 
   useEffect(() => {
@@ -320,7 +315,7 @@ What would you like to do?`,
               symbol: 'S',
               address: address,
               network: 'Sonic Testnet',
-              usdValue: (parseFloat(balanceValue) * 2.0).toFixed(2), // Mock USD value
+              usdValue: (parseFloat(balanceValue) * 0.5).toFixed(2), // Accurate USD value (1 S = $0.50)
               lastUpdate: new Date().toLocaleTimeString()
             }
           }]
@@ -454,13 +449,7 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
 
       setMessages(prev => [...prev, aiMessage])
       
-      // Speak the response using Web Speech API
-      if (response && 'speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(response)
-        utterance.rate = 0.9
-        utterance.volume = 0.7
-        speechSynthesis.speak(utterance)
-      }
+      // Voice functionality removed - AI responses are text-only
     } catch (error) {
       console.error('Error:', error)
       const errorMessage: Message = {
@@ -475,35 +464,7 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
     }
   }
 
-  const handleVoiceToggle = () => {
-    if (!speechSupported) return
-    
-    if (isListening) {
-      setIsListening(false)
-      setTranscript('')
-    } else {
-      setIsListening(true)
-      // Implement real speech recognition here
-      if ('webkitSpeechRecognition' in window) {
-        const recognition = new (window as any).webkitSpeechRecognition()
-        recognition.continuous = false
-        recognition.interimResults = false
-        recognition.lang = 'en-US'
-        
-        recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript
-          setTranscript(transcript)
-          setIsListening(false)
-        }
-        
-        recognition.onerror = () => {
-          setIsListening(false)
-        }
-        
-        recognition.start()
-      }
-    }
-  }
+  // Voice toggle removed
 
   const renderCards = (cards: any[]) => {
     return cards.map((card, index) => {
@@ -847,7 +808,7 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
     <div className="max-w-4xl mx-auto">
       {/* Chat Messages */}
       <div className="bg-white rounded-2xl shadow-xl h-[600px] flex flex-col">
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[80%]">
@@ -889,7 +850,7 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
               💼 Balance
             </button>
             <button
-              onClick={() => setInput('Send 1 S token')}
+              onClick={() => setInput('Send 1 S token to Enter wallet address: ')}
               className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition-colors"
             >
               ⚡ Send Tokens
@@ -928,26 +889,10 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isLoading}
               />
-              {isListening && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                </div>
-              )}
+
             </div>
             
-            {speechSupported && (
-              <button
-                onClick={handleVoiceToggle}
-                className={`p-3 rounded-xl transition-colors ${
-                  isListening 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title={isListening ? 'Stop listening' : 'Start voice input'}
-              >
-                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </button>
-            )}
+
             
             <button
               onClick={handleSend}
