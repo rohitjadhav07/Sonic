@@ -239,7 +239,9 @@ export default function NFTPage() {
           className="w-full h-full object-cover opacity-20"
           muted
           loop
+          autoPlay
           playsInline
+          preload="auto"
         >
           <source src="/Nft.mp4" type="video/mp4" />
         </video>
@@ -291,7 +293,7 @@ export default function NFTPage() {
                   : 'text-white hover:bg-white/10'
               }`}
             >
-              <Image className="w-5 h-5 inline mr-2" />
+              <Image className="w-5 h-5 inline mr-2" src="/logo.png" alt="market" width={20} height={20} />
               Marketplace
             </button>
           </div>
@@ -352,6 +354,8 @@ export default function NFTPage() {
                           src={generatedImage}
                           alt="Generated NFT"
                           className="w-full rounded-xl shadow-lg"
+                          loading="eager"
+                          decoding="async"
                         />
                         <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
                           AI Generated
@@ -431,6 +435,8 @@ export default function NFTPage() {
                           src={nft.image}
                           alt={nft.name}
                           className="w-full h-48 object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
                           #{nft.tokenId}

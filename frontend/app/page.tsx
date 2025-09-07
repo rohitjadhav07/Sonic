@@ -99,9 +99,11 @@ export default function Home() {
             <div className="text-center mb-12 pt-8">
               <div className="max-w-2xl mx-auto mb-8">
                 <video 
-                  autoPlay 
-                  muted 
-                  loop 
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
                   className="w-full h-auto rounded-2xl shadow-2xl"
                 >
                   <source src="/home.mp4" type="video/mp4" />
