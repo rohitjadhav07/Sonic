@@ -13,11 +13,6 @@ const queryClient = new QueryClient({
       staleTime: 300000, // 5 minutes
     },
   },
-  logger: {
-    log: () => {},
-    warn: () => {},
-    error: () => {},
-  },
 })
 
 interface SafeProvidersProps {

@@ -29,16 +29,11 @@ export const sonicTestnet = defineChain({
 export const safeConfig = createConfig({
   chains: [sonicTestnet],
   connectors: [
-    injected({ shimDisconnect: true }),
-    metaMask({ shimDisconnect: true }),
+    injected(),
+    metaMask(),
   ],
   transports: {
-    [sonicTestnet.id]: http('https://rpc.testnet.soniclabs.com', {
-      batch: true,
-      fetchOptions: {
-        timeout: 10000,
-      },
-    }),
+    [sonicTestnet.id]: http('https://rpc.testnet.soniclabs.com'),
   },
   ssr: true,
   batch: {

@@ -144,12 +144,12 @@ export function useSubscription() {
         throw new Error('Wallet not connected')
       }
       
-      writeContract({
-        address: SUBSCRIPTION_CONTRACT_ADDRESS as `0x${string}`,
-        abi: SUBSCRIPTION_ABI,
-        functionName: 'purchaseSubscription',
-        value: parseEther('1'), // 1 S token
-      })
+      // Mock subscription purchase - replace with actual contract interaction
+      console.log('Mock subscription purchase')
+      console.log('Contract address:', SUBSCRIPTION_CONTRACT_ADDRESS)
+      console.log('Amount: 1 S token')
+      // TODO: Implement actual contract interaction
+      alert('Subscription purchase will be implemented with actual contract interaction.')
     } catch (err: any) {
       setError(err.message || 'Failed to purchase subscription')
       setIsLoading(false)

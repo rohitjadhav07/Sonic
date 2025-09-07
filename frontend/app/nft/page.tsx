@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useAccount, useContractWrite, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import { Wand2, Image, Loader2, ExternalLink, Copy, Heart, Eye, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -57,7 +57,7 @@ export default function NFTPage() {
   const [activeTab, setActiveTab] = useState<'generate' | 'marketplace'>('generate')
 
   // Contract interaction
-  const { data: hash, writeContract } = useContractWrite()
+  const { writeContract, data: hash } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   })
@@ -186,14 +186,11 @@ export default function NFTPage() {
       const mintData = await mintResponse.json()
       
       if (mintData.success) {
-        // Mint NFT on contract with IPFS URI
-        writeContract({
-          address: NFT_CONTRACT_ADDRESS,
-          abi: NFT_CONTRACT_ABI,
-          functionName: 'mint',
-          args: [address!, mintData.token_uri],
-          value: parseEther('0.001'), // Minting fee
-        })
+        // Mock NFT minting - replace with actual contract interaction
+        console.log('NFT metadata stored on IPFS:', mintData.token_uri)
+        console.log('Ready to mint NFT on contract')
+        // TODO: Implement actual contract minting
+        alert('NFT metadata stored successfully! Contract minting will be implemented.')
       } else {
         throw new Error(mintData.error || 'Failed to store metadata')
       }
