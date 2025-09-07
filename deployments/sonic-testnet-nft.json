@@ -1,0 +1,14 @@
+{
+  "contractName": "SonicNFT",
+  "address": "0x1234567890abcdef1234567890abcdef12345678",
+  "network": "sonic-testnet",
+  "chainId": 14601,
+  "name": "Sonic AI NFTs",
+  "symbol": "SONIC",
+  "baseTokenURI": "https://ipfs.io/ipfs/",
+  "deployer": "0x0000000000000000000000000000000000000000",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "mintingFee": "0.001",
+  "maxSupply": "10000",
+  "note": "Mock contract for testing - replace with real deployment when ready"
+}

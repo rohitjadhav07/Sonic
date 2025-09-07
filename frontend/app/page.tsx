@@ -73,6 +73,12 @@ export default function Home() {
               </div>
               <div className="hidden md:flex items-center space-x-4">
                 <Link 
+                  href="/nft"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  🎨 NFT Studio
+                </Link>
+                <Link 
                   href="/pricing"
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
                 >

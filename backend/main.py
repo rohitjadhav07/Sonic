@@ -12,6 +12,15 @@ import qrcode
 import io
 import base64
 from PIL import Image
+import sys
+import os
+
+# Add services directory to path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'services'))
+
+from nft_service import NFTService
+from ipfs_service import IPFSService
+from ai_image_service import AIImageService
 
 app = FastAPI(title="Astra AI - Sonic Blockchain Agent", version="1.0.0")
 
@@ -43,9 +52,23 @@ class NFTRequest(BaseModel):
     image_prompt: str
     address: str
 
+class NFTGenerateRequest(BaseModel):
+    prompt: str
+    user_address: str
+
+class NFTMintRequest(BaseModel):
+    token_id: int
+    owner_address: str
+    metadata: Dict[str, Any]
+
 # Sonic Testnet configuration
 SONIC_TESTNET_RPC = "https://rpc.testnet.soniclabs.com"
 SONIC_EXPLORER = "https://testnet.sonicscan.org"
+
+# Initialize services
+nft_service = NFTService()
+ipfs_service = IPFSService()
+ai_image_service = AIImageService()
 
 @app.get("/")
 async def root():
@@ -412,6 +435,176 @@ Try commands like:
             response=f"I encountered an error: {str(e)}. Please try again or rephrase your request.",
             cards=[]
         )
+
+# NFT API Endpoints
+
+@app.post("/api/nft/generate")
+async def generate_nft(request: NFTGenerateRequest):
+    """Generate NFT metadata from prompt"""
+    try:
+        # Generate AI image
+        ai_result = await ai_image_service.generate_image(request.prompt)
+        
+        if ai_result["success"]:
+            image_url = ai_result["image_url"]
+            provider = ai_result["provider"]
+        else:
+            # Fallback to mock image
+            image_url = f"https://picsum.photos/400/400?random={hash(request.prompt) % 1000}"
+            provider = "mock"
+        
+        # Generate metadata
+        result = nft_service.generate_nft_metadata(
+            prompt=request.prompt,
+            image_url=image_url,
+            user_address=request.user_address
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "imageUrl": image_url,
+                "metadata": result["metadata"],
+                "name": result["name"],
+                "description": result["description"],
+                "attributes": result["attributes"],
+                "ai_provider": provider,
+                "ai_model": ai_result.get("model", "unknown")
+            }
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/nft/ai-status")
+async def get_ai_status():
+    """Check which AI providers are available"""
+    try:
+        providers = ai_image_service.get_available_providers()
+        return {
+            "success": True,
+            "providers": providers,
+            "recommendations": {
+                "openai": "Best quality, ~$0.04 per image",
+                "replicate": "Good quality, ~$0.01-0.05 per image", 
+                "huggingface": "Free tier available",
+                "stability": "Professional quality"
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/nft/mint")
+async def mint_nft(request: NFTMintRequest):
+    """Store NFT metadata and return IPFS hash for minting"""
+    try:
+        # Store metadata on IPFS
+        ipfs_hash = nft_service.store_nft_metadata(request.metadata)
+        
+        # Create NFT record
+        nft_record = nft_service.create_nft_record(
+            token_id=request.token_id,
+            owner_address=request.owner_address,
+            ipfs_hash=ipfs_hash,
+            metadata=request.metadata
+        )
+        
+        return {
+            "success": True,
+            "ipfs_hash": ipfs_hash,
+            "token_uri": f"ipfs://{ipfs_hash}",
+            "nft_record": nft_record
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/nft/marketplace")
+async def get_marketplace_nfts(limit: int = 50, offset: int = 0):
+    """Get all NFTs for marketplace display"""
+    try:
+        nfts = nft_service.get_all_nfts(limit=limit, offset=offset)
+        return {
+            "success": True,
+            "nfts": nfts,
+            "total": len(nfts),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/nft/owner/{address}")
+async def get_owner_nfts(address: str):
+    """Get NFTs owned by a specific address"""
+    try:
+        nfts = nft_service.get_nfts_by_owner(address)
+        return {
+            "success": True,
+            "nfts": nfts,
+            "owner": address,
+            "count": len(nfts)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/nft/{token_id}")
+async def get_nft_by_id(token_id: int):
+    """Get NFT by token ID"""
+    try:
+        nft = nft_service.get_nft_by_token_id(token_id)
+        if nft:
+            return {
+                "success": True,
+                "nft": nft
+            }
+        else:
+            raise HTTPException(status_code=404, detail="NFT not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/nft/{token_id}/like")
+async def like_nft(token_id: int):
+    """Like an NFT"""
+    try:
+        nft = nft_service.get_nft_by_token_id(token_id)
+        if nft:
+            new_likes = nft["likes"] + 1
+            nft_service.update_nft_stats(token_id, likes=new_likes)
+            return {
+                "success": True,
+                "token_id": token_id,
+                "likes": new_likes
+            }
+        else:
+            raise HTTPException(status_code=404, detail="NFT not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/nft/{token_id}/view")
+async def view_nft(token_id: int):
+    """Record an NFT view"""
+    try:
+        nft = nft_service.get_nft_by_token_id(token_id)
+        if nft:
+            new_views = nft["views"] + 1
+            nft_service.update_nft_stats(token_id, views=new_views)
+            return {
+                "success": True,
+                "token_id": token_id,
+                "views": new_views
+            }
+        else:
+            raise HTTPException(status_code=404, detail="NFT not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     print("🚀 Starting Astra AI Backend - Sonic Blockchain Agent...")

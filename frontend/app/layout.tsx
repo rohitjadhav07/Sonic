@@ -5,7 +5,7 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Astra AI - Sonic Blockchain Agent',
+  title: 'Smart - Sonic Blockchain Agent',
   description: 'AI-powered blockchain agent for Sonic Network - Making Web3 accessible through conversation',
 }
 

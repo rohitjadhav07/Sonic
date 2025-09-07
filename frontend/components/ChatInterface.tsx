@@ -80,6 +80,20 @@ What would you like to do?`,
     scrollToBottom()
   }, [messages])
 
+  // Monitor transaction completion and show success message
+  useEffect(() => {
+    if (hash && isConfirmed) {
+      // Add success message to chat
+      const successMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        type: 'ai',
+        content: `🎉 Transaction completed successfully! Your S tokens have been sent and confirmed on Sonic Network. Thanks to Sonic's sub-second finality, your transaction was processed almost instantly!`,
+        timestamp: new Date(),
+      }
+      setMessages(prev => [...prev, successMessage])
+    }
+  }, [hash, isConfirmed])
+
   // Generate QR code for payment
   const generateQRCode = (address: string, amount?: string) => {
     const baseUrl = `https://api.qrserver.com/v1/create-qr-code/`
@@ -348,7 +362,6 @@ What would you like to do?`,
                 data: {
                   amount: amount,
                   to: toAddress,
-                  status: isConfirming ? 'Confirming' : isConfirmed ? 'Confirmed' : 'Pending',
                   hash: hash,
                   network: 'Sonic Testnet',
                   timestamp: new Date().toLocaleString()
@@ -569,15 +582,8 @@ Try saying something like "show my transaction history", "view on explorer", "Ch
         case 'transaction':
           return (
             <div key={index} className="mt-4 p-6 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl border border-green-200 shadow-lg">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center mb-4">
                 <h4 className="text-lg font-bold text-gray-900">⚡ Transaction</h4>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  data.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                  data.status === 'Confirming' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {data.status}
-                </span>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between">
