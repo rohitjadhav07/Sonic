@@ -27,7 +27,12 @@ app = FastAPI(title="Astra AI - Sonic Blockchain Agent", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://*.vercel.app",
+        "https://sonic-nft-studio.vercel.app",
+        "https://sonic-nft-studio-git-main.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

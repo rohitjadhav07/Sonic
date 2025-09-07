@@ -66,7 +66,8 @@ export default function NFTPage() {
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/nft/marketplace')
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+        const response = await fetch(`${apiUrl}/nft/marketplace`)
         const data = await response.json()
         
         if (data.success) {
@@ -122,7 +123,8 @@ export default function NFTPage() {
     setIsGenerating(true)
     try {
       // Call backend API to generate image
-      const response = await fetch('http://localhost:8000/api/nft/generate', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+      const response = await fetch(`${apiUrl}/nft/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +170,8 @@ export default function NFTPage() {
     setIsMinting(true)
     try {
       // First, store metadata on IPFS via backend
-      const mintResponse = await fetch('http://localhost:8000/api/nft/mint', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+      const mintResponse = await fetch(`${apiUrl}/nft/mint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
